@@ -1,0 +1,2 @@
+### I am developing this Node.js application to solve the need to handle/manage payment gateway transactions.
+#### Currently working with Iyzico payment gateway, and communicates with e-commerce backend via Graphql.
