@@ -1,13 +1,6 @@
-import dotenv from "dotenv";
-import express from "express";
+import { router, purify } from "../utils/init.js";
 import iyzipay from "../iyzipay/createIyzipay.js";
-import DOMPurify from "dompurify";
-import { JSDOM } from "jsdom";
 
-dotenv.config();
-const router = express.Router();
-const window = new JSDOM("").window;
-const purify = DOMPurify(window);
 
 router.post("/check_cf_token", async (req, res) => {
     try {
