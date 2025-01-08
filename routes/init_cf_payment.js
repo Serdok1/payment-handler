@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
-import Iyzipay from "iyzipay";
+import iyzipay from "../iyzipay/createIyzipay.js";
 import DOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
 import { validationResult } from "express-validator";
@@ -11,16 +11,7 @@ const router = express.Router();
 const window = new JSDOM("").window;
 const purify = DOMPurify(window);
 
-// İyzico API yapılandırması
-const iyzipay = new Iyzipay({
-  apiKey: process.env.IYZICO_API_KEY,
-  secretKey: process.env.IYZICO_SECRET_KEY,
-  uri: process.env.IYZICO_BASE_URL,
-});
-
-// Ödeme başlatma endpoint'i
 router.post("/init_cf_payment", paymentValidator, async (req, res) => {
-  // Doğrulama sonuçlarını kontrol et
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -38,7 +29,6 @@ router.post("/init_cf_payment", paymentValidator, async (req, res) => {
     conversationId,
   } = req.body;
 
-  // Girdi verilerini temizleme
   const sanitizedBuyer = Object.fromEntries(
     Object.entries(buyer).map(([key, value]) => [key, purify.sanitize(value)])
   );
@@ -63,7 +53,6 @@ router.post("/init_cf_payment", paymentValidator, async (req, res) => {
     )
   );
 
-  // İyzico ödeme isteği için yapılandırma
   const request = {
     locale: purify.sanitize(locale),
     price: purify.sanitize(price),
@@ -78,7 +67,6 @@ router.post("/init_cf_payment", paymentValidator, async (req, res) => {
   };
 
   try {
-    // İyzico API ödeme çağrısı
     iyzipay.checkoutFormInitialize.create(request, (err, result) => {
       if (err) {
         console.error("Checkout Form Error:", err);

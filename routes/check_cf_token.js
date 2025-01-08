@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
-import Iyzipay from "iyzipay";
+import iyzipay from "../iyzipay/createIyzipay.js";
 import DOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
 
@@ -8,12 +8,6 @@ dotenv.config();
 const router = express.Router();
 const window = new JSDOM("").window;
 const purify = DOMPurify(window);
-
-var iyzipay = new Iyzipay({
-  apiKey: process.env.IYZICO_API_KEY,
-  secretKey: process.env.IYZICO_SECRET_KEY,
-  uri: process.env.IYZICO_BASE_URL,
-});
 
 router.post("/check_cf_token", async (req, res) => {
     try {
