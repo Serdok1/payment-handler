@@ -6,12 +6,14 @@ import checkAndCreate from "./routes/check_and_create.js";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import csurf from "csurf";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 100, // Her IP için maksimum 100 istek
+  windowMs: 15 * 60 * 1000,
+  max: 50,
 });
 
 const app = express();
@@ -50,6 +52,8 @@ app.use(
 );
 app.use(helmet.hidePoweredBy());
 app.use(limiter);
+app.use(cookieParser());
+app.use(csurf({ cookie: { httpOnly: true, sameSite: "strict" } }));
 
 app.use(express.json());
 app.use(cors(corsOptions));
@@ -59,6 +63,9 @@ app.options("*", cors(corsOptions)); // Tüm rotalarda preflight isteklerine izi
 app.use("/api", initCfPayment);
 app.use("/api", checkCfToken);
 app.use("/api", checkAndCreate);
+app.get("/csrf-token", (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
